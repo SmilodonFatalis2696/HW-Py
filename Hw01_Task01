@@ -1,0 +1,66 @@
+import os.path
+
+
+def tsv_read(path_to_csv_file, delim=','):
+    if not os.path.isfile(path_to_csv_file):
+        print("Error, such file doesn't exist")
+        return []
+    with open(path_to_csv_file, "r") as f:
+        arr = []
+        for lines in f:
+            arr1 = []
+            start, flag = 0, False
+            for pos, x in enumerate(lines):
+                if x == '"':
+                    flag = not (flag)
+                if flag == False and x == delim:
+                    k=lines[start:pos]
+                    if k.startswith('"'):
+                        k=k[1:]
+                    if k.endswith('"'):
+                        k=k[:-1]
+                    arr1.append(k)
+                    start = pos + 1
+            if x != '\n':
+                k=lines[start:pos+1]
+            else:
+                k = lines[start:pos]
+            if k.startswith('"'):
+                k = k[1:]
+            if k.endswith('"'):
+                k = k[:-1]
+            arr1.append(k)
+            arr.append(arr1)
+        return arr
+
+
+def write_csv(path_to_csv_file,lines,delim=","):
+    if not is_tsv(lines):
+        print('))))')
+    if os.path.isfile(path_to_csv_file):
+        with open(path_to_csv_file,"r+") as file:
+            for line in file:
+                del line
+    with open(path_to_csv_file,"w") as file:
+        for line in lines:
+            for k in range(len(line)):
+                if delim in line[k]:
+                    line[k] = '"' + line[k] + '"'
+            line=delim.join(line)+'\n'
+            print(line, file = file, end="")
+
+def is_tsv(lines):
+    m = 0
+    k = 0
+    h = 0
+    for i in lines:
+        if ((type(i) is str) and h==1) or (not(type(i) is str) and k==1):
+            return False
+        if type(i) is str:
+            k=1
+        else:
+            h=1
+        if m != len(i) and m != 0:
+            return False
+        m = len(i)
+    return True
