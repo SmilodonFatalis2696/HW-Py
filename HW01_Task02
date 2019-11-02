@@ -1,0 +1,98 @@
+import os.path
+
+
+def parse(path_to_file):
+    if not os.path.isfile(path_to_file):
+        print("Error, such file doesn't exist")
+        return {}
+    with open(path_to_file, "r") as f:
+        arr = []
+        for lines in f:
+            if lines.startswith('>'):
+                lines = lines[1:]
+            if lines.endswith('\n'):
+                arr.append(lines[:-1])
+            else:
+                arr.append(lines)
+        if len(arr) % 2 != 0:
+            print("smth")
+            return {}
+        dict = {arr[i]: arr[i + 1] for i in range(0, len(arr), 2)}
+        return dict
+
+
+mass = {"G": 57.021464,
+        "A": 71.037114,
+        "S": 87.032028,
+        "P": 97.052764,
+        "V": 99.068414,
+        "T": 101.047678,
+        "C": 103.009184,
+        "I": 113.084064,
+        'L': 113.084064,
+        'N': 114.042927,
+        'D': 115.026943,
+        'Q': 128.058578,
+        'K': 128.094963,
+        'E': 129.042593,
+        'M': 131.040485,
+        'H': 137.058912,
+        'F': 147.068414,
+        'R': 156.101111,
+        'Y': 163.063329,
+        'W': 186.079313}
+
+
+def calc_mass(prot_seq):
+    k = 0
+    for i in range(len(prot_seq)):
+        k += mass[prot_seq[i]]
+    return k
+
+
+gencode = {
+    'AUA': 'I', 'AUC': 'I', 'AUU': 'I', 'AUG': 'M',
+    'ACA': 'T', 'ACC': 'T', 'ACG': 'T', 'ACU': 'T',
+    'AAC': 'N', 'AAU': 'N', 'AAA': 'K', 'AAG': 'K',
+    'AGC': 'S', 'AGU': 'S', 'AGA': 'R', 'AGG': 'R',
+    'CUA': 'L', 'CUC': 'L', 'CUG': 'L', 'CUU': 'L',
+    'CCA': 'P', 'CCC': 'P', 'CCG': 'P', 'CCU': 'P',
+    'CAC': 'H', 'CAU': 'H', 'CAA': 'Q', 'CAG': 'Q',
+    'CGA': 'R', 'CGC': 'R', 'CGG': 'R', 'CGU': 'R',
+    'GUA': 'V', 'GUC': 'V', 'GUG': 'V', 'GUU': 'V',
+    'GCA': 'A', 'GCC': 'A', 'GCG': 'A', 'GCU': 'A',
+    'GAC': 'D', 'GAU': 'D', 'GAA': 'E', 'GAG': 'E',
+    'GGA': 'G', 'GGC': 'G', 'GGG': 'G', 'GGU': 'G',
+    'UCA': 'S', 'UCC': 'S', 'UCG': 'S', 'UCU': 'S',
+    'UUC': 'F', 'UUU': 'F', 'UUA': 'L', 'UUG': 'L',
+    'UAC': 'Y', 'UAU': 'Y', 'UAA': '_', 'UAG': '_',
+    'UGC': 'C', 'UGU': 'C', 'UGA': '_', 'UGG': 'W'}
+def translate(s):
+    res = []
+    result = 'M'
+    k = ''
+    index = s.index("AUG")
+    s = s[index + 3:]
+    for i in range(len(s)):
+        k += s[i]
+        if k in gencode.keys():
+            if k == 'UAA' or k == 'UAG' or k == 'UGA':
+                res.append(result)
+                break
+            result += gencode[k]
+            k = ''
+    while "AUG" in s:
+        result = 'M'
+        k = ''
+        index = s.index("AUG")
+        s = s[index + 3:]
+        for i in range(len(s)):
+            k += s[i]
+            if k in gencode.keys():
+                if k == 'UAA' or k == 'UAG' or k == 'UGA':
+                    res.append(result)
+                    break
+                result += gencode[k]
+                k = ''
+    res.sort(key=str)
+    return res
